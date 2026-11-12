@@ -17,6 +17,11 @@
         <input type="search" name="q" value="{{ busqueda }}"
                placeholder="Escribe un título o tema..." required>
         <button type="submit">Buscar libros</button>
+        <label class="filtro">
+            <input type="checkbox" name="leibles" value="1"
+                   {% if solo_leibles %}checked{% endif %}>
+            Solo libros que se pueden leer
+        </label>
     </form>
  
     {% if busqueda %}
@@ -41,6 +46,17 @@
             <h3>{{ libro.titulo }}</h3>
             <p><strong>Autor:</strong> {{ libro.autor }}</p>
             <p><strong>Año:</strong> {{ libro.anio }}</p>
+            {% if libro.lectura %}
+                <a class="boton-leer" href="{{ libro.lectura.url }}"
+                   target="_blank" rel="noopener noreferrer">
+                    {% if libro.lectura.libre %}Leer gratis{% else %}Leer (préstamo gratis){% endif %}
+                </a>
+                {% if not libro.lectura.libre %}
+                <p class="nota">Requiere una cuenta gratuita en Internet Archive.</p>
+                {% endif %}
+            {% else %}
+                <p class="nota">Sin versión digital disponible.</p>
+            {% endif %}
             {% if libro.clave %}
                 <a href="https://openlibrary.org{{ libro.clave }}"
                    target="_blank" rel="noopener noreferrer">Ver ficha del libro</a>
