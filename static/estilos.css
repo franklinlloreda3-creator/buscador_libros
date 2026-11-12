@@ -106,3 +106,34 @@ form button:hover {
     color: #6b7099;
     font-size: 0.9rem;
 }
+
+form {
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filtro {
+    flex-basis: 100%;
+    font-size: 0.95rem;
+}
+
+.boton-leer {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    color: white !important;
+    background: #1b7f3b;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.boton-leer:hover {
+    background: #156830;
+}
+
+.nota {
+    color: #6b7099;
+    font-size: 0.8rem !important;
+}
+
+}
