@@ -1,7 +1,7 @@
 import requests
  
 API_URL = "https://openlibrary.org/search.json"
-CABECERAS = {"User-Agent": "BuscadorLibrosADSO (delia.herazot@campusucc.edu.co)"}
+CABECERAS = {"User-Agent": "BuscadorLibrosADSO (Franklinlloreda0@gmail.com)"}
 CAMPOS = "key,title,author_name,first_publish_year,cover_i,ebook_access,ia"
  
  
