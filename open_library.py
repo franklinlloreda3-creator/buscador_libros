@@ -2,16 +2,21 @@ import requests
  
 API_URL = "https://openlibrary.org/search.json"
 CABECERAS = {"User-Agent": "BuscadorLibrosADSO (delia.herazot@campusucc.edu.co)"}
-CAMPOS = "key,title,author_name,first_publish_year,cover_i"
+CAMPOS = "key,title,author_name,first_publish_year,cover_i,ebook_access,ia"
  
  
 class ErrorDeApi(Exception):
     """La API externa no respondió como se esperaba."""
  
  
-def buscar_libros(texto, limite=10):
-    """Busca libros y devuelve una lista de diccionarios sencillos."""
-    parametros = {"q": texto, "limit": limite, "fields": CAMPOS}
+def buscar_libros(texto, limite=12, solo_leibles=False):
+    """Busca libros y devuelve una lista de diccionarios sencillos.
+
+    Si solo_leibles es True, devuelve solo los que tienen versión digital.
+    """
+    # Si se filtra por leíbles, se piden más resultados para no quedar vacíos
+    pedir = 60 if solo_leibles else limite
+    parametros = {"q": texto, "limit": pedir, "fields": CAMPOS}
  
     try:
         respuesta = requests.get(
@@ -39,11 +44,31 @@ def buscar_libros(texto, limite=10):
     libros = []
     for doc in datos.get("docs", []):
         autores = doc.get("author_name") or []
+        lectura = _enlace_de_lectura(doc)
+        if solo_leibles and not lectura:
+            continue
         libros.append({
             "titulo": doc.get("title", "Sin título"),
             "autor": autores[0] if autores else "Autor desconocido",
             "anio": doc.get("first_publish_year", "No disponible"),
             "portada": doc.get("cover_i"),
             "clave": doc.get("key", ""),
+            "lectura": lectura,
         })
-    return libros
+    return libros[:limite]
+
+
+def _enlace_de_lectura(doc):
+    """Devuelve el enlace para leer el libro en Internet Archive, o None.
+
+    ebook_access: "public" = se lee libre; "borrowable" = se pide prestado
+    gratis con una cuenta de Internet Archive; otros valores = no hay ebook.
+    """
+    acceso = doc.get("ebook_access", "no_ebook")
+    ids = doc.get("ia") or []
+    if not ids or acceso not in ("public", "borrowable"):
+        return None
+    return {
+        "url": f"https://archive.org/details/{ids[0]}",
+        "libre": acceso == "public",
+    }
