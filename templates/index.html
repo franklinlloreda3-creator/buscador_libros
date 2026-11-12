@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de libros</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+<header>
+    <h1>Buscador de libros</h1>
+    <p>Encuentra tus libros favoritos en un solo lugar</p>
+</header>
+ 
+<main>
+    <form method="GET" action="/">
+        <input type="search" name="q" value="{{ busqueda }}"
+               placeholder="Escribe un título o tema..." required>
+        <button type="submit">Buscar libros</button>
+    </form>
+ 
+    {% if busqueda %}
+        <h2>Resultados para: {{ busqueda }}</h2>
+    {% endif %}
+ 
+    {% if mensaje %}
+        <p class="mensaje">{{ mensaje }}</p>
+    {% endif %}
+ 
+    {% if libros %}
+    <section class="resultados">
+        {% for libro in libros %}
+        <article class="libro">
+            {% if libro.portada %}
+                <img class="portada" loading="lazy"
+                     src="https://covers.openlibrary.org/b/id/{{ libro.portada }}-M.jpg"
+                     alt="Portada de {{ libro.titulo }}">
+            {% else %}
+                <div class="sin-portada">Portada no disponible</div>
+            {% endif %}
+            <h3>{{ libro.titulo }}</h3>
+            <p><strong>Autor:</strong> {{ libro.autor }}</p>
+            <p><strong>Año:</strong> {{ libro.anio }}</p>
+            {% if libro.clave %}
+                <a href="https://openlibrary.org{{ libro.clave }}"
+                   target="_blank" rel="noopener noreferrer">Ver ficha del libro</a>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </section>
+    {% endif %}
+</main>
+</body>
+</html>

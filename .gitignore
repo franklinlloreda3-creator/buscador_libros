@@ -1,0 +1,13 @@
+# Entorno virtual (cada persona crea el suyo)
+venv/
+.venv/
+
+# Archivos generados por Python
+__pycache__/
+*.pyc
+
+# Editor / sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
