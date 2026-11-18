@@ -278,3 +278,92 @@ dialog#lector::backdrop { background: rgba(60, 10, 35, 0.7); }
     .barra button { width: 100%; }
     .portada, .sin-portada { height: 260px; }
 }
+
+/* ---------- Animaciones ---------- */
+@keyframes subir {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flotar {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50%      { transform: translateY(-22px) rotate(8deg); }
+}
+
+@keyframes degradado {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes latido {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(47, 158, 107, 0.6); }
+    50%      { box-shadow: 0 0 0 7px rgba(47, 158, 107, 0); }
+}
+
+@keyframes aparecer {
+    from { opacity: 0; transform: scale(0.94); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(120deg, #c2255c, #f06595, #e64980, #c2255c);
+    background-size: 300% 300%;
+    animation: degradado 14s ease infinite;
+}
+
+.hero-contenido { position: relative; z-index: 1; }
+.hero-contenido > * { animation: subir 0.8s ease backwards; }
+.hero-contenido > :nth-child(2) { animation-delay: 0.1s; }
+.hero-contenido > :nth-child(3) { animation-delay: 0.2s; }
+.hero-contenido > :nth-child(4) { animation-delay: 0.3s; }
+.hero-contenido > :nth-child(5) { animation-delay: 0.4s; }
+
+.flotantes span {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.35;
+    animation: flotar 7s ease-in-out infinite;
+}
+
+.flotantes span:nth-child(1) { top: 12%; left: 6%;  animation-delay: 0s; }
+.flotantes span:nth-child(2) { top: 62%; left: 14%; animation-delay: 1.2s; font-size: 1.5rem; }
+.flotantes span:nth-child(3) { top: 18%; right: 8%; animation-delay: 2.1s; font-size: 2.4rem; }
+.flotantes span:nth-child(4) { top: 70%; right: 16%; animation-delay: 0.7s; font-size: 1.6rem; }
+.flotantes span:nth-child(5) { top: 40%; left: 3%;  animation-delay: 3s; font-size: 1.4rem; }
+.flotantes span:nth-child(6) { top: 48%; right: 4%; animation-delay: 1.8s; }
+
+.barra { transition: box-shadow 0.3s, transform 0.3s; }
+.barra:focus-within {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35), 0 14px 36px rgba(120, 10, 60, 0.45);
+}
+
+.barra button, .boton-leer, .sugerencias a {
+    transition: background 0.25s, transform 0.2s;
+}
+
+.barra button:active, .boton-leer:active { transform: scale(0.95); }
+.sugerencias a:hover { transform: translateY(-3px); }
+
+.libro { animation: subir 0.6s ease backwards; animation-delay: calc(var(--i, 0) * 70ms); }
+.portada { transition: transform 0.5s; }
+.marco-portada { overflow: hidden; }
+.libro:hover .portada { transform: scale(1.08); }
+
+.insignia.libre { animation: latido 2.2s infinite; }
+
+.pasos div { animation: subir 0.7s ease backwards; transition: transform 0.25s, box-shadow 0.25s; }
+.pasos div:nth-child(2) { animation-delay: 0.15s; }
+.pasos div:nth-child(3) { animation-delay: 0.3s; }
+.pasos div:hover { transform: translateY(-6px); box-shadow: 0 12px 26px rgba(194, 37, 92, 0.2); }
+
+.encabezado-resultados, .mensaje { animation: subir 0.5s ease backwards; }
+
+dialog#lector[open] { animation: aparecer 0.3s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
