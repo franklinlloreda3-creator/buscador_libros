@@ -7,64 +7,141 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
 </head>
 <body>
-<header>
-    <h1>Buscador de libros</h1>
-    <p>Para mi novia yini mi reina Hermosa te amoooo</p>
+<header class="hero">
+    <div class="hero-contenido">
+        <span class="etiqueta">📚 Biblioteca digital</span>
+        <h1>Encuentra tu próximo libro</h1>
+        <p>Busca por título, autor o tema y léelo directamente aquí.</p>
+
+        <form method="GET" action="/" id="form-busqueda">
+            <div class="barra">
+                <input type="search" name="q" value="{{ busqueda }}"
+                       placeholder="Ej: Don Quijote, García Márquez, Frankenstein..." required>
+                <button type="submit" id="boton-buscar">Buscar</button>
+            </div>
+            <label class="filtro">
+                <input type="checkbox" name="leibles" value="1"
+                       {% if solo_leibles %}checked{% endif %}>
+                Mostrar solo libros que se pueden leer
+            </label>
+        </form>
+
+        {% if not busqueda %}
+        <div class="sugerencias">
+            <span>Prueba con:</span>
+            {% for s in ["Don Quijote", "Sherlock Holmes", "Frankenstein", "Romeo y Julieta", "Alicia en el país de las maravillas", "Drácula"] %}
+                <a href="/?q={{ s | urlencode }}&leibles=1">{{ s }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
 </header>
- 
+
 <main>
-    <form method="GET" action="/">
-        <input type="search" name="q" value="{{ busqueda }}"
-               placeholder="Escribe un título o tema..." required>
-        <button type="submit">Buscar libros</button>
-        <label class="filtro">
-            <input type="checkbox" name="leibles" value="1"
-                   {% if solo_leibles %}checked{% endif %}>
-            Solo libros que se pueden leer
-        </label>
-    </form>
- 
     {% if busqueda %}
-        <h2>Resultados para: {{ busqueda }}</h2>
+        <div class="encabezado-resultados">
+            <h2>Resultados para “{{ busqueda }}”</h2>
+            {% if libros %}
+                <span class="contador">{{ libros | length }} libros</span>
+            {% endif %}
+        </div>
     {% endif %}
- 
+
     {% if mensaje %}
         <p class="mensaje">{{ mensaje }}</p>
     {% endif %}
- 
+
+    {% if not busqueda %}
+    <section class="pasos">
+        <div><b>1</b><h3>Busca</h3><p>Escribe el título, el autor o un tema.</p></div>
+        <div><b>2</b><h3>Elige</h3><p>Los que tienen la insignia verde se pueden leer.</p></div>
+        <div><b>3</b><h3>Lee</h3><p>Ábrelo en pantalla con el botón “Leer”.</p></div>
+    </section>
+    {% endif %}
+
     {% if libros %}
     <section class="resultados">
         {% for libro in libros %}
         <article class="libro">
-            {% if libro.portada %}
-                <img class="portada" loading="lazy"
-                     src="https://covers.openlibrary.org/b/id/{{ libro.portada }}-M.jpg"
-                     alt="Portada de {{ libro.titulo }}">
-            {% else %}
-                <div class="sin-portada">Portada no disponible</div>
-            {% endif %}
-            <h3>{{ libro.titulo }}</h3>
-            <p><strong>Autor:</strong> {{ libro.autor }}</p>
-            <p><strong>Año:</strong> {{ libro.anio }}</p>
-            {% if libro.lectura %}
-                <a class="boton-leer" href="{{ libro.lectura.url }}"
-                   target="_blank" rel="noopener noreferrer">
-                    {% if libro.lectura.libre %}Leer gratis{% else %}Leer (préstamo gratis){% endif %}
-                </a>
-                {% if not libro.lectura.libre %}
-                <p class="nota">Requiere una cuenta gratuita en Internet Archive.</p>
+            <div class="marco-portada">
+                {% if libro.portada %}
+                    <img class="portada" loading="lazy"
+                         src="https://covers.openlibrary.org/b/id/{{ libro.portada }}-M.jpg"
+                         alt="Portada de {{ libro.titulo }}">
+                {% else %}
+                    <div class="sin-portada"><span>📖</span>Portada no disponible</div>
                 {% endif %}
-            {% else %}
-                <p class="nota">Sin versión digital disponible.</p>
-            {% endif %}
-            {% if libro.clave %}
-                <a href="https://openlibrary.org{{ libro.clave }}"
-                   target="_blank" rel="noopener noreferrer">Ver ficha del libro</a>
-            {% endif %}
+                {% if libro.lectura %}
+                    <span class="insignia {{ 'libre' if libro.lectura.libre else 'prestamo' }}">
+                        {{ 'Gratis' if libro.lectura.libre else 'Préstamo' }}
+                    </span>
+                {% endif %}
+            </div>
+            <div class="info">
+                <h3>{{ libro.titulo }}</h3>
+                <p class="autor">{{ libro.autor }}</p>
+                <p class="anio">Publicado en {{ libro.anio }}</p>
+
+                {% if libro.lectura and libro.lectura.libre %}
+                    <button class="boton-leer" type="button"
+                            data-embed="{{ libro.lectura.url.replace('/details/', '/embed/') }}"
+                            data-url="{{ libro.lectura.url }}"
+                            data-titulo="{{ libro.titulo }}">📖 Leer aquí</button>
+                {% elif libro.lectura %}
+                    <a class="boton-leer" href="{{ libro.lectura.url }}"
+                       target="_blank" rel="noopener noreferrer">📖 Pedir prestado</a>
+                    <p class="nota">Requiere cuenta gratuita en Internet Archive.</p>
+                {% else %}
+                    <p class="nota">Sin versión digital disponible.</p>
+                {% endif %}
+
+                {% if libro.clave %}
+                    <a class="ficha" href="https://openlibrary.org{{ libro.clave }}"
+                       target="_blank" rel="noopener noreferrer">Ver ficha del libro →</a>
+                {% endif %}
+            </div>
         </article>
         {% endfor %}
     </section>
     {% endif %}
 </main>
+
+<footer>Hecho con Flask · Datos de Open Library e Internet Archive</footer>
+
+<dialog id="lector">
+    <div class="lector-barra">
+        <strong id="lector-titulo"></strong>
+        <div>
+            <a id="lector-abrir" target="_blank" rel="noopener noreferrer">Abrir en otra pestaña ↗</a>
+            <button type="button" id="lector-cerrar" aria-label="Cerrar">✕</button>
+        </div>
+    </div>
+    <iframe id="lector-marco" title="Lector de libro" allowfullscreen></iframe>
+</dialog>
+
+<script>
+    const lector = document.getElementById("lector");
+    const marco = document.getElementById("lector-marco");
+
+    document.querySelectorAll("button.boton-leer").forEach(function (b) {
+        b.addEventListener("click", function () {
+            document.getElementById("lector-titulo").textContent = b.dataset.titulo;
+            document.getElementById("lector-abrir").href = b.dataset.url;
+            marco.src = b.dataset.embed;
+            lector.showModal();
+        });
+    });
+
+    function cerrar() { lector.close(); marco.src = "about:blank"; }
+    document.getElementById("lector-cerrar").addEventListener("click", cerrar);
+    lector.addEventListener("click", function (e) { if (e.target === lector) cerrar(); });
+    lector.addEventListener("cancel", function () { marco.src = "about:blank"; });
+
+    document.getElementById("form-busqueda").addEventListener("submit", function () {
+        const btn = document.getElementById("boton-buscar");
+        btn.textContent = "Buscando…";
+        btn.disabled = true;
+    });
+</script>
 </body>
 </html>
