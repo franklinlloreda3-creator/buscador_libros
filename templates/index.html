@@ -8,6 +8,9 @@
 </head>
 <body>
 <header class="hero">
+    <div class="flotantes" aria-hidden="true">
+        <span>📖</span><span>💖</span><span>📚</span><span>✨</span><span>🌸</span><span>📕</span>
+    </div>
     <div class="hero-contenido">
         <span class="etiqueta">📚 Biblioteca digital</span>
         <h1>Encuentra tu próximo libro</h1>
@@ -29,7 +32,7 @@
         {% if not busqueda %}
         <div class="sugerencias">
             <span>Prueba con:</span>
-            {% for s in ["Boulevar", "Sherlock Holmes", "Frankenstein", "Romeo y Julieta", "Alicia en el país de las maravillas", "Drácula"] %}
+            {% for s in ["El Principito", "Boulevard", "Neymar Jr", "Romeo y Julieta", "Alicia en el país de las maravillas", "Drácula"] %}
                 <a href="/?q={{ s | urlencode }}&leibles=1">{{ s }}</a>
             {% endfor %}
         </div>
@@ -62,7 +65,7 @@
     {% if libros %}
     <section class="resultados">
         {% for libro in libros %}
-        <article class="libro">
+        <article class="libro" style="--i: {{ loop.index0 }}">
             <div class="marco-portada">
                 {% if libro.portada %}
                     <img class="portada" loading="lazy"
@@ -106,42 +109,3 @@
     {% endif %}
 </main>
 
-<footer>Hecho con Flask · Datos de Open Library e Internet Archive</footer>
-
-<dialog id="lector">
-    <div class="lector-barra">
-        <strong id="lector-titulo"></strong>
-        <div>
-            <a id="lector-abrir" target="_blank" rel="noopener noreferrer">Abrir en otra pestaña ↗</a>
-            <button type="button" id="lector-cerrar" aria-label="Cerrar">✕</button>
-        </div>
-    </div>
-    <iframe id="lector-marco" title="Lector de libro" allowfullscreen></iframe>
-</dialog>
-
-<script>
-    const lector = document.getElementById("lector");
-    const marco = document.getElementById("lector-marco");
-
-    document.querySelectorAll("button.boton-leer").forEach(function (b) {
-        b.addEventListener("click", function () {
-            document.getElementById("lector-titulo").textContent = b.dataset.titulo;
-            document.getElementById("lector-abrir").href = b.dataset.url;
-            marco.src = b.dataset.embed;
-            lector.showModal();
-        });
-    });
-
-    function cerrar() { lector.close(); marco.src = "about:blank"; }
-    document.getElementById("lector-cerrar").addEventListener("click", cerrar);
-    lector.addEventListener("click", function (e) { if (e.target === lector) cerrar(); });
-    lector.addEventListener("cancel", function () { marco.src = "about:blank"; });
-
-    document.getElementById("form-busqueda").addEventListener("submit", function () {
-        const btn = document.getElementById("boton-buscar");
-        btn.textContent = "Buscando…";
-        btn.disabled = true;
-    });
-</script>
-</body>
-</html>
